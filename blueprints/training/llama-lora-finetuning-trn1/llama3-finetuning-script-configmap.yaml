@@ -8,16 +8,21 @@ data:
 
     # Patch trl library to workaround issue https://github.com/huggingface/optimum-neuron/issues/761
     pip3 install -U pip
-    pip3 install trl==0.11.4
+    pip3 install optimum-neuron==0.3.0 trl==0.11.4 peft==0.16.0 
+
+    export WANDB_MODE=disabled  # Disable Weights & Biases integration
 
     # Generate timestamp and set the model output directory
     TIMESTAMP=$(date +%Y%m%d-%H%M%S)
     MODEL_OUTPUT_DIR="/shared/llama3_tuned_model_${TIMESTAMP}"
 
     # Download the three required files directly from GitHub
-    curl -O https://raw.githubusercontent.com/ai-on-eks/main/blueprints/training/llama-lora-finetuning-trn1/assets/finetune_llama.py
-    curl -O https://raw.githubusercontent.com/ai-on-eks/main/blueprints/training/llama-lora-finetuning-trn1/assets/consolidate_adapter_shards_and_merge_model.py
-    curl -O https://raw.githubusercontent.com/ai-on-eks/main/blueprints/training/llama-lora-finetuning-trn1/assets/test_model.py
+    #curl -O https://raw.githubusercontent.com/ai-on-eks/main/blueprints/training/llama-lora-finetuning-trn1/assets/finetune_llama.py
+    #curl -O https://raw.githubusercontent.com/ai-on-eks/main/blueprints/training/llama-lora-finetuning-trn1/assets/consolidate_adapter_shards_and_merge_model.py
+    #curl -O https://raw.githubusercontent.com/ai-on-eks/main/blueprints/training/llama-lora-finetuning-trn1/assets/test_model.py
+    curl -O https://raw.githubusercontent.com/5cp/ai-on-eks/refs/heads/trn1_lora_updates/blueprints/training/llama-lora-finetuning-trn1/assets/finetune_llama.py
+    curl -O https://raw.githubusercontent.com/5cp/ai-on-eks/refs/heads/trn1_lora_updates/blueprints/training/llama-lora-finetuning-trn1/assets/consolidate_adapter_shards_and_merge_model.py
+    curl -O https://raw.githubusercontent.com/5cp/ai-on-eks/refs/heads/trn1_lora_updates/blueprints/training/llama-lora-finetuning-trn1/assets/test_model.py
 
     export FINETUNED_SHARDED_MODEL_DIR="./finetuned_sharded_model"
     export FINETUNED_MERGED_MODEL_DIR="./finetuned_merged_model"
@@ -34,7 +39,8 @@ data:
         --max_steps 250 \
         --logging_steps 10 \
         --learning_rate 1e-5 \
-        --dataloader_drop_last True
+        --dataloader_drop_last True \
+        --skip_cache_push true
 
     echo -e "\n\nModel fine-tuning completed. Fine-tuned sharded model stored at: $FINETUNED_SHARDED_MODEL_DIR\n"
 

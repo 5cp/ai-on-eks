@@ -9,7 +9,8 @@ from transformers import (
 
 from optimum.neuron import NeuronHfArgumentParser as HfArgumentParser
 from optimum.neuron import NeuronSFTConfig, NeuronSFTTrainer, NeuronTrainingArguments
-from optimum.neuron.distributed import lazy_load_for_parallelism
+from optimum.neuron.models.training import NeuronModelForCausalLM
+from torch import bfloat16, float32
 
 
 def training_function(script_args, training_args):
@@ -44,8 +45,13 @@ def training_function(script_args, training_args):
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.eos_token_id = 128001
 
-    with lazy_load_for_parallelism(tensor_parallel_size=training_args.tensor_parallel_size):
-        model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B")
+    model = NeuronModelForCausalLM.from_pretrained(
+            "NousResearch/Meta-Llama-3-8B",
+            training_args.trn_config,
+            torch_dtype = bfloat16 if training_args.bf16 else float32,
+            attn_implementation="flash_attention_2",
+            #use_flash_attention_2=True,
+            )
 
     config = LoraConfig(
         r=8,
@@ -68,7 +74,7 @@ def training_function(script_args, training_args):
     args = training_args.to_dict()
 
     sft_config = NeuronSFTConfig(
-        max_seq_length=1024,
+        max_seq_length=2048,
         packing=True,
         **args,
         dataset_kwargs={
