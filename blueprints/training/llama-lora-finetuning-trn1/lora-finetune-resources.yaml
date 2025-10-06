@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: 763104351884.dkr.ecr.us-west-2.amazonaws.com/huggingface-pytorch-training-neuronx:2.1.2-transformers4.43.2-neuronx-py310-sdk2.20.0-ubuntu20.04
+          image: public.ecr.aws/neuron/pytorch-training-neuronx:2.8.0-neuronx-py311-sdk2.26.0-ubuntu22.04
           imagePullPolicy: Always
           command: ["/bin/bash", "-c"]
           args: ["/scripts/llama3_finetuning.sh > /shared/llama3_finetuning.out 2>&1"]
