@@ -86,14 +86,14 @@ def training_function(script_args, training_args):
     trainer = NeuronSFTTrainer(
         args=sft_config,
         model=model,
-        peft_config=config,
+        peft_config=None,
         tokenizer=tokenizer,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
     )
 
     print(trainer.model)
-    trainer.model.print_trainable_parameters()
+    #trainer.model.print_trainable_parameters()
 
     # Start training
     trainer.train()
